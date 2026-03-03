@@ -45,8 +45,10 @@ const Home = () => {
 
   const deleteTodo = (id:string) => {
    setTodos((prev)=> prev.filter((todo) => todo.id != id))
-    
-    
+  }
+
+  const reorderTodo = (newTodos: Todo[]): void => {
+    setTodos(newTodos);
   }
   return (
     <>
@@ -54,7 +56,7 @@ const Home = () => {
         <div className="today-list-container w-full md:w-8/12 p-2  sm:p-5 rounded m-auto bg-white">
           <h2 className="text-4xl text-center font-bold">Todo List</h2>
           <AddTodo onAdd={addTodo} />
-          <TodoList todos={todos} onUpdate={updateTodo} onDelete={deleteTodo} />
+          <TodoList todos={todos} onUpdate={updateTodo} onDelete={deleteTodo} onReorder={reorderTodo} />
         </div>
       </div>
     </>

@@ -6,11 +6,13 @@ interface TodoListProps {
   todos: Todo[];
   onUpdate: (id:string, newText:string) => void;
   onDelete: (id:string) => void;
+  onReorder: (todos: Todo[]) => void;
 }
 
-const TodoList = ({ todos, onUpdate, onDelete }: TodoListProps) => {
+const TodoList = ({ todos, onUpdate, onDelete, onReorder }: TodoListProps) => {
   const [editingId, setEditingId] = useState<string|null>(null);
   const [editText, setEditText] = useState<string>("")
+  const [draggedId, setDraggedId] = useState<string | null>(null)
   const selectedInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -33,12 +35,28 @@ const TodoList = ({ todos, onUpdate, onDelete }: TodoListProps) => {
   const handleDelet = (id:string) => {
     onDelete(id)
   }
+
+  const handleDrop = (targetId:string) => {
+
+    if(!draggedId || draggedId === targetId) return;
+
+    const updatedTodos = [...todos]
+    
+    const draggedIndex = updatedTodos.findIndex((t)=>t.id === draggedId);
+    const targetIndex = updatedTodos.findIndex((t)=> t.id === targetId);
+    
+      const [removed] = updatedTodos.splice(draggedIndex, 1);
+      updatedTodos.splice(targetIndex, 0, removed)
+      
+      onReorder(updatedTodos)
+      
+  }
   
   return (
     <div className="todo-list flex flex-col gap-1 justify-center mt-8">
       {todos?.map((todo) => {
         return (
-          <div key={todo.id} className="flex">
+          <div key={todo.id} className="flex" draggable onDragStart={()=>setDraggedId(todo.id)} onDragOver={(e)=>e.preventDefault()} onDrop={()=>handleDrop(todo.id)}>
             <button className="bg-gray-200 px-3 rounded mr-2 cursor-grab text-2xl font-medium">
               <FaArrowsAlt color="gray" />
             </button>
